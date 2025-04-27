@@ -336,8 +336,9 @@ const Portfolio: React.FC = () => {
                                         }` }
                                     style={ { transformStyle: 'preserve-3d' } }
                                 >
-                                    {/* Front of card - Image only */ }
-                                    <div
+                                    {/* Front of card - Image with link - Match gallery implementation */ }
+                                    <Link
+                                        href={ `/work/${item.id}` }
                                         className="absolute w-full h-full backface-hidden rounded-lg overflow-hidden shadow-lg shadow-cyan-900/20"
                                         style={ { backfaceVisibility: 'hidden' } }
                                     >
@@ -349,12 +350,19 @@ const Portfolio: React.FC = () => {
                                             alt={ item.alt }
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
-                                    </div>
+                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 flex flex-col justify-end">
+                                            <span className="text-cyan-400 text-sm font-medium mb-1">{ db.getCategoryNameById( item.category ) }</span>
+                                            <h3 className="text-xl font-bold text-white">{ item.title }</h3>
+                                        </div>
+                                    </Link>
 
                                     {/* Back of card - Details */ }
                                     <div
                                         className="absolute w-full h-full backface-hidden bg-gray-900 rounded-lg p-6 flex flex-col justify-between transform rotate-y-180 shadow-lg shadow-cyan-900/20"
-                                        style={ { backfaceVisibility: 'hidden' } }
+                                        style={ {
+                                            backfaceVisibility: 'hidden',
+                                            zIndex: hoveredCardId === item.id || flippedCards[ item.id ] ? 1 : 0  // Add z-index control
+                                        } }
                                     >
                                         <div>
                                             <span className="text-cyan-400 text-sm font-medium">{ db.getCategoryNameById( item.category ) }</span>
@@ -362,12 +370,15 @@ const Portfolio: React.FC = () => {
                                             <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-full my-4"></div>
                                             <p className="text-gray-300 text-sm">{ item.description.split( '\n\n' )[ 0 ] }</p>
                                         </div>
-                                        <Link
-                                            href={ `/work/${item.id}` }
-                                            className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors mt-4 self-end"
-                                        >
-                                            View Project →
-                                        </Link>
+                                        <div className="self-end"> {/* Wrap in a div to improve clickability */ }
+                                            <Link
+                                                href={ `/work/${item.id}` }
+                                                className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors inline-block"
+                                                onClick={ ( e ) => e.stopPropagation() } // Prevent event bubbling
+                                            >
+                                                View Project →
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
