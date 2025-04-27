@@ -3,218 +3,25 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Map, Tag, Share2, Instagram, Twitter, Linkedin } from 'lucide-react';
+import db from '@/db';
 
-// Define interfaces for our data
-interface WorkItem {
-    id: string;
-    title: string;
-    category: string;
-    image: string;
-    date: string;
-    location: string;
-    description: string;
-    tags: string[];
-}
-
+// Interface for cursor position
 interface CursorPosition {
     x: number;
     y: number;
 }
 
-// In a real application, this data would come from a CMS or API
-const works: WorkItem[] = [
-    {
-        id: '1',
-        title: 'Urban Reflections',
-        category: 'Street Photography',
-        image: '/placeholder-image.jpg',
-        date: 'February 2025',
-        location: 'New York City, NY',
-        description: `This series explores the interplay of light, water, and urban architecture after rainfall in New York City. The reflections create an alternate reality, doubling the city's complexity and revealing new perspectives.
-    
-    Shot during the early morning golden hour, these images capture a quieter moment in the city's restless rhythm. The reflections in rain puddles transform ordinary scenes into surreal compositions, challenging our perception of the urban landscape.`,
-        tags: [ 'Reflection', 'Urban', 'Street Photography', 'New York' ]
-    },
-    {
-        id: '2',
-        title: 'Neon Nights',
-        category: 'Cityscape',
-        image: '/placeholder-image.jpg',
-        date: 'January 2025',
-        location: 'Tokyo, Japan',
-        description: `A visual journey through Tokyo's electric nightscape, where neon lights transform the city into a cyberpunk wonderland. This series captures the energy and visual chaos of urban Japan after dark.
-    
-    The photographs explore how artificial lighting shapes our experience of the modern city, creating a dreamlike atmosphere that blurs the line between reality and science fiction. The intense colors and reflections document a unique aspect of contemporary urban culture.`,
-        tags: [ 'Night Photography', 'Neon', 'Urban', 'Tokyo' ]
-    },
-    {
-        id: '3',
-        title: 'Portrait Series',
-        category: 'Portrait',
-        image: '/placeholder-image.jpg',
-        date: 'March 2025',
-        location: 'Studio, Brooklyn',
-        description: `An ongoing portrait project examining the diverse faces of New York City. Each subject brings their own story, creating a collective narrative about identity, belonging, and the human experience in an urban environment.
-    
-    Using natural light and minimal settings, these portraits aim to capture authentic moments that reveal something essential about each subject. The series continues to grow as new personalities and stories are added.`,
-        tags: [ 'Portrait', 'People', 'Studio', 'Black and White' ]
-    },
-    {
-        id: '4',
-        title: 'Time-lapse: NYC',
-        category: 'Video',
-        image: '/placeholder-image.jpg',
-        date: 'April 2025',
-        location: 'New York City, NY',
-        description: `A time-lapse exploration of New York City's dynamic rhythm, showing the pulse of the city from dawn to dusk. This project captures the flow of people, traffic, and light through the urban landscape.
-    
-    By compressing time, patterns emerge that are invisible to the naked eye, revealing the city as a living organism with its own circulatory system and metabolism.`,
-        tags: [ 'Time-lapse', 'Video', 'Urban', 'New York' ]
-    },
-    {
-        id: '5',
-        title: 'Abandoned Spaces',
-        category: 'Urban Exploration',
-        image: '/placeholder-image.jpg',
-        date: 'May 2025',
-        location: 'Various Locations',
-        description: `Documenting forgotten places where nature reclaims what humans have left behind, revealing beauty in decay. This series explores abandoned buildings, factories, and urban spaces that have been left to deteriorate.
-    
-    These photographs capture the haunting beauty of places frozen in time, telling stories of industrial decline, changing economic conditions, and the impermanence of human creations.`,
-        tags: [ 'Urban Exploration', 'Abandoned', 'Decay', 'Architecture' ]
-    },
-    {
-        id: '6',
-        title: 'Motion Study',
-        category: 'Abstract',
-        image: '/placeholder-image.jpg',
-        date: 'June 2025',
-        location: 'Studio Work',
-        description: `An experimental series using long exposure techniques to transform ordinary movements into abstract visual art. This project explores the intersection of time, light, and movement.
-    
-    By manipulating shutter speed and camera movement, these images reveal the hidden choreography of everyday actions and objects, creating ethereal compositions from mundane moments.`,
-        tags: [ 'Abstract', 'Long Exposure', 'Motion', 'Experimental' ]
-    },
-    {
-        id: '7',
-        title: 'Street Life',
-        category: 'Street',
-        image: '/placeholder-image.jpg',
-        date: 'July 2025',
-        location: 'Various Cities',
-        description: `Candid photography capturing the essence of daily life in the bustling streets of major cities around the world. This ongoing series documents authentic human moments as they unfold.
-    
-    From chance encounters to daily routines, these images celebrate the diversity, energy, and unpredictability of urban life through an unfiltered lens.`,
-        tags: [ 'Street', 'Documentary', 'People', 'Urban Life' ]
-    },
-    {
-        id: '8',
-        title: 'Architectural Forms',
-        category: 'Urban',
-        image: '/placeholder-image.jpg',
-        date: 'August 2025',
-        location: 'Various Cities',
-        description: `A study of contemporary architectural design, focusing on geometric shapes, patterns, and the interplay of light and shadow. This series examines buildings as artistic expressions.
-    
-    By isolating specific elements of architecture, these photographs reveal the careful design decisions that shape our built environment and transform functional structures into works of art.`,
-        tags: [ 'Architecture', 'Geometry', 'Design', 'Urban' ]
-    },
-    {
-        id: '9',
-        title: 'Portrait Series II',
-        category: 'Portrait',
-        image: '/placeholder-image.jpg',
-        date: 'September 2025',
-        location: 'Studio, Brooklyn',
-        description: `Studio portraits exploring character and personality through controlled lighting and minimal backgrounds. This series focuses on the nuanced expressions and features of diverse subjects.
-    
-    Using carefully crafted lighting setups, these portraits aim to reveal the inner world of each subject while creating visually striking images with strong compositional elements.`,
-        tags: [ 'Portrait', 'Studio', 'Lighting', 'Character Study' ]
-    },
-    {
-        id: '10',
-        title: 'Urban Geometry',
-        category: 'Abstract',
-        image: '/placeholder-image.jpg',
-        date: 'October 2025',
-        location: 'Various Cities',
-        description: `Finding abstract compositions within the geometry of urban environments and architecture. This series transforms familiar city scenes into graphic patterns and shapes.
-    
-    By focusing on lines, angles, and intersections, these photographs extract the underlying geometry that forms the visual foundation of our cities, creating abstract compositions from concrete reality.`,
-        tags: [ 'Abstract', 'Geometry', 'Urban', 'Patterns' ]
-    },
-    {
-        id: '11',
-        title: 'Street Musicians',
-        category: 'Street',
-        image: '/placeholder-image.jpg',
-        date: 'November 2025',
-        location: 'Various Cities',
-        description: `Documenting the passionate performers who bring music to our streets and public spaces. This series captures the energy, dedication, and artistry of musicians who perform for the passing crowds.
-    
-    These images explore both the performers and their audiences, revealing the intimate connections that form through music in public spaces.`,
-        tags: [ 'Music', 'Performance', 'Street', 'Artists' ]
-    },
-    {
-        id: '12',
-        title: 'Documentary: NYC',
-        category: 'Video',
-        image: '/placeholder-image.jpg',
-        date: 'December 2025',
-        location: 'New York City, NY',
-        description: `A documentary film exploring the hidden stories and unseen corners of New York City. This project goes beyond the tourist attractions to reveal the authentic heart of the city.
-    
-    Through interviews with local residents, exploration of overlooked neighborhoods, and documentation of daily rituals, this film presents a multifaceted portrait of an ever-changing metropolis.`,
-        tags: [ 'Documentary', 'Film', 'New York', 'Urban Stories' ]
-    },
-    {
-        id: '13',
-        title: 'Light Studies',
-        category: 'Abstract',
-        image: '/placeholder-image.jpg',
-        date: 'January 2026',
-        location: 'Various Locations',
-        description: `Experimental photography focused on the behavior and quality of light in various environments. This series treats light itself as the subject rather than the objects it illuminates.
-    
-    Through long exposures, reflections, and optical effects, these images capture the ethereal qualities of light as it moves, refracts, and transforms our visual perception of the world.`,
-        tags: [ 'Light', 'Experimental', 'Abstract', 'Long Exposure' ]
-    },
-    {
-        id: '14',
-        title: 'Skyline',
-        category: 'Urban',
-        image: '/placeholder-image.jpg',
-        date: 'February 2026',
-        location: 'Various Cities',
-        description: `Panoramic views of iconic city skylines during different times of day and weather conditions. This series documents how the visual character of a city transforms with changing light.
-    
-    From dawn to dusk and through all seasons, these photographs capture the dynamic nature of urban silhouettes and the distinctive architectural personalities of different cities around the world.`,
-        tags: [ 'Cityscape', 'Urban', 'Architecture', 'Skyline' ]
-    },
-    {
-        id: '15',
-        title: 'Portrait Series III',
-        category: 'Portrait',
-        image: '/placeholder-image.jpg',
-        date: 'March 2026',
-        location: 'Various Locations',
-        description: `Environmental portraits that capture subjects in their natural settings to tell deeper stories about who they are. This series explores the relationship between people and their personal spaces.
-    
-    By photographing subjects in locations that are meaningful to them, these portraits reveal how our environments shape our identities and provide visual context for understanding individual stories.`,
-        tags: [ 'Portrait', 'Environmental', 'Identity', 'Storytelling' ]
-    }
-];
-
 export default function WorkDetail( { id }: { id: string } ) {
-    const [ work, setWork ] = useState<WorkItem | null>( null );
+    const [ work, setWork ] = useState<typeof db.galleryItems[ 0 ] | null>( null );
     const [ loading, setLoading ] = useState<boolean>( true );
     const [ cursorPosition, setCursorPosition ] = useState<CursorPosition>( { x: 0, y: 0 } );
     const [ cursorHidden, setCursorHidden ] = useState<boolean>( true );
 
     useEffect( () => {
         if ( id ) {
-            // In a real app, this would be an API call
-            const foundWork = works.find( w => w.id === id );
+            // Get work from the database
+            const numericId = parseInt( id );
+            const foundWork = db.galleryItems.find( w => w.id === numericId );
             if ( foundWork ) {
                 setWork( foundWork );
             }
@@ -280,16 +87,16 @@ export default function WorkDetail( { id }: { id: string } ) {
                             <span>Back to Gallery</span>
                         </Link>
                         <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 text-transparent bg-clip-text">
-                            LumeX
+                            { db.siteInfo.name }
                         </div>
                         <div className="flex space-x-4">
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.instagram } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Instagram size={ 20 } />
                             </a>
-                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.twitter } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Twitter size={ 20 } />
                             </a>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.linkedin } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Linkedin size={ 20 } />
                             </a>
                         </div>
@@ -314,7 +121,7 @@ export default function WorkDetail( { id }: { id: string } ) {
                     <div className="container mx-auto px-6">
                         <div className="max-w-4xl mx-auto">
                             <h1 className="text-4xl md:text-5xl font-bold mb-3">{ work.title }</h1>
-                            <div className="text-cyan-400 mb-8">{ work.category }</div>
+                            <div className="text-cyan-400 mb-8">{ db.getCategoryNameById( work.category ) }</div>
 
                             {/* Main image */ }
                             <div className="relative rounded-lg overflow-hidden mb-10">
@@ -347,13 +154,13 @@ export default function WorkDetail( { id }: { id: string } ) {
                                 <div className="flex items-center">
                                     <Share2 size={ 20 } className="text-cyan-400 mr-3" />
                                     <div className="flex space-x-3">
-                                        <a href="#" className="hover:text-cyan-400 transition-colors">
+                                        <a href={ db.siteInfo.social.instagram } className="hover:text-cyan-400 transition-colors">
                                             <Instagram size={ 18 } />
                                         </a>
-                                        <a href="#" className="hover:text-cyan-400 transition-colors">
+                                        <a href={ db.siteInfo.social.twitter } className="hover:text-cyan-400 transition-colors">
                                             <Twitter size={ 18 } />
                                         </a>
-                                        <a href="#" className="hover:text-cyan-400 transition-colors">
+                                        <a href={ db.siteInfo.social.linkedin } className="hover:text-cyan-400 transition-colors">
                                             <Linkedin size={ 18 } />
                                         </a>
                                     </div>
@@ -389,30 +196,28 @@ export default function WorkDetail( { id }: { id: string } ) {
                 ) }
             </main>
 
-            {/* Related works - would normally be dynamically generated */ }
+            {/* Related works */ }
             <section className="py-12 bg-gray-900">
                 <div className="container mx-auto px-6">
                     <h2 className="text-2xl font-bold mb-8">More Works</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        { works
-                            .filter( w => w.id !== id )
-                            .slice( 0, 3 ) // Limit to 3 items
-                            .map( work => (
+                        { work && db.getRelatedWorks( work.id, 3, work.category )
+                            .map( relatedWork => (
                                 <Link
-                                    href={ `/work/${work.id}` }
-                                    key={ work.id }
+                                    href={ `/work/${relatedWork.id}` }
+                                    key={ relatedWork.id }
                                     className="group relative overflow-hidden rounded-lg bg-gray-800 hover:transform hover:scale-[1.02] transition-all duration-500"
                                 >
                                     <div className="h-60 overflow-hidden">
                                         <img
-                                            src={ work.image }
-                                            alt={ work.title }
+                                            src={ relatedWork.image }
+                                            alt={ relatedWork.title }
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
                                     </div>
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
-                                        <span className="text-cyan-400 text-sm font-medium mb-2">{ work.category }</span>
-                                        <h3 className="text-xl font-bold text-white mb-2">{ work.title }</h3>
+                                        <span className="text-cyan-400 text-sm font-medium mb-2">{ db.getCategoryNameById( relatedWork.category ) }</span>
+                                        <h3 className="text-xl font-bold text-white mb-2">{ relatedWork.title }</h3>
                                     </div>
                                 </Link>
                             ) ) }
@@ -424,11 +229,11 @@ export default function WorkDetail( { id }: { id: string } ) {
             <footer className="py-10 bg-black">
                 <div className="container mx-auto px-6 text-center">
                     <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 text-transparent bg-clip-text mb-3">
-                        LumeX
+                        { db.siteInfo.name }
                     </div>
-                    <p className="text-gray-400 mb-6">Capturing moments, telling stories</p>
+                    <p className="text-gray-400 mb-6">{ db.siteInfo.tagline }</p>
                     <div className="border-t border-gray-800 pt-6 text-gray-500 text-sm">
-                        © { new Date().getFullYear() } LumeX Photography. All rights reserved.
+                        { db.siteInfo.copyright }
                     </div>
                 </div>
             </footer>

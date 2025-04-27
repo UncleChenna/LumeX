@@ -3,22 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Instagram, Twitter, Linkedin } from 'lucide-react';
 import Link from 'next/link';
+import db from '@/db';
 
-// Define our interfaces
-interface Category {
-    id: string;
-    name: string;
-}
-
-interface GalleryItem {
-    id: number;
-    title: string;
-    category: string;
-    image: string;
-    alt: string;
-    description?: string;
-}
-
+// Interface for cursor position
 interface CursorPosition {
     x: number;
     y: number;
@@ -40,35 +27,6 @@ export default function Gallery() {
     const handleCardHover = ( id: number, isHovered: boolean ) => {
         setHoveredCardId( isHovered ? id : null );
     };
-
-    // Categories for filtering
-    const categories: Category[] = [
-        { id: 'all', name: 'All Works' },
-        { id: 'street', name: 'Street' },
-        { id: 'portrait', name: 'Portraits' },
-        { id: 'urban', name: 'Urban' },
-        { id: 'video', name: 'Video' },
-        { id: 'abstract', name: 'Abstract' }
-    ];
-
-    // Gallery items - in a real implementation, this would come from a CMS or database
-    const galleryItems: GalleryItem[] = [
-        { id: 1, title: 'Urban Reflections', category: 'street', image: '/placeholder-image.jpg', alt: 'Urban scene with reflections in puddles', description: 'A series exploring the interplay of light, water, and urban architecture after rainfall in New York City.' },
-        { id: 2, title: 'Neon Nights', category: 'urban', image: '/placeholder-image.jpg', alt: 'City at night with neon lights', description: 'A visual journey through Tokyo\'s electric nightscape, where neon lights transform the city into a cyberpunk wonderland.' },
-        { id: 3, title: 'Portrait Series I', category: 'portrait', image: '/placeholder-image.jpg', alt: 'Dramatic portrait of a person', description: 'An ongoing portrait project examining the diverse faces of New York City, capturing authentic moments that reveal essential human stories.' },
-        { id: 4, title: 'Time-lapse: NYC', category: 'video', image: '/placeholder-image.jpg', alt: 'New York City time-lapse preview', description: 'A time-lapse exploration of New York City\'s dynamic rhythm, showing the pulse of the city from dawn to dusk.' },
-        { id: 5, title: 'Abandoned Spaces', category: 'urban', image: '/placeholder-image.jpg', alt: 'Abandoned building interior', description: 'Documenting forgotten places where nature reclaims what humans have left behind, revealing beauty in decay.' },
-        { id: 6, title: 'Motion Study', category: 'abstract', image: '/placeholder-image.jpg', alt: 'Abstract motion blur photography', description: 'An experimental series using long exposure techniques to transform ordinary movements into abstract visual art.' },
-        { id: 7, title: 'Street Life', category: 'street', image: '/placeholder-image.jpg', alt: 'People on city streets', description: 'Candid photography capturing the essence of daily life in the bustling streets of major cities around the world.' },
-        { id: 8, title: 'Architectural Forms', category: 'urban', image: '/placeholder-image.jpg', alt: 'Modern architecture', description: 'A study of contemporary architectural design, focusing on geometric shapes, patterns, and the interplay of light and shadow.' },
-        { id: 9, title: 'Portrait Series II', category: 'portrait', image: '/placeholder-image.jpg', alt: 'Studio portrait', description: 'Studio portraits exploring character and personality through controlled lighting and minimal backgrounds.' },
-        { id: 10, title: 'Urban Geometry', category: 'abstract', image: '/placeholder-image.jpg', alt: 'Geometric patterns in urban environment', description: 'Finding abstract compositions within the geometry of urban environments and architecture.' },
-        { id: 11, title: 'Street Musicians', category: 'street', image: '/placeholder-image.jpg', alt: 'Musicians performing on the street', description: 'Documenting the passionate performers who bring music to our streets and public spaces.' },
-        { id: 12, title: 'Documentary: NYC', category: 'video', image: '/placeholder-image.jpg', alt: 'Documentary film preview', description: 'A documentary film exploring the hidden stories and unseen corners of New York City.' },
-        { id: 13, title: 'Light Studies', category: 'abstract', image: '/placeholder-image.jpg', alt: 'Experiments with light', description: 'Experimental photography focused on the behavior and quality of light in various environments.' },
-        { id: 14, title: 'Skyline', category: 'urban', image: '/placeholder-image.jpg', alt: 'City skyline view', description: 'Panoramic views of iconic city skylines during different times of day and weather conditions.' },
-        { id: 15, title: 'Portrait Series III', category: 'portrait', image: '/placeholder-image.jpg', alt: 'Environmental portrait', description: 'Environmental portraits that capture subjects in their natural settings to tell deeper stories about who they are.' }
-    ];
 
     // Setup automatic flipping of selected cards to attract attention
     useEffect( () => {
@@ -118,9 +76,9 @@ export default function Gallery() {
     }, [ hoveredCardId, flippedCards ] );
 
     // Filter gallery items based on active category
-    const filteredItems: GalleryItem[] = activeCategory === 'all'
-        ? galleryItems
-        : galleryItems.filter( item => item.category === activeCategory );
+    const filteredItems = activeCategory === 'all'
+        ? db.galleryItems
+        : db.galleryItems.filter( item => item.category === activeCategory );
 
     // Custom cursor effect
     useEffect( () => {
@@ -165,16 +123,16 @@ export default function Gallery() {
                             <span>Back to Home</span>
                         </Link>
                         <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 text-transparent bg-clip-text">
-                            LumeX
+                            { db.siteInfo.name }
                         </div>
                         <div className="flex space-x-4">
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.instagram } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Instagram size={ 20 } />
                             </a>
-                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.twitter } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Twitter size={ 20 } />
                             </a>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.linkedin } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Linkedin size={ 20 } />
                             </a>
                         </div>
@@ -198,7 +156,7 @@ export default function Gallery() {
 
                         {/* Category filters */ }
                         <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-10">
-                            { categories.map( ( category ) => (
+                            { db.categories.map( ( category ) => (
                                 <button
                                     key={ category.id }
                                     onClick={ () => setActiveCategory( category.id ) }
@@ -250,7 +208,7 @@ export default function Gallery() {
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 flex flex-col justify-end">
-                                                <span className="text-cyan-400 text-sm font-medium mb-1">{ categories.find( cat => cat.id === item.category )?.name }</span>
+                                                <span className="text-cyan-400 text-sm font-medium mb-1">{ db.getCategoryNameById( item.category ) }</span>
                                                 <h3 className="text-xl font-bold text-white">{ item.title }</h3>
                                             </div>
                                         </Link>
@@ -261,10 +219,10 @@ export default function Gallery() {
                                             style={ { backfaceVisibility: 'hidden' } }
                                         >
                                             <div>
-                                                <span className="text-cyan-400 text-sm font-medium">{ categories.find( cat => cat.id === item.category )?.name }</span>
+                                                <span className="text-cyan-400 text-sm font-medium">{ db.getCategoryNameById( item.category ) }</span>
                                                 <h3 className="text-2xl font-bold text-white mt-2">{ item.title }</h3>
                                                 <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-full my-4"></div>
-                                                <p className="text-gray-300 text-sm">{ item.description }</p>
+                                                <p className="text-gray-300 text-sm">{ item.description.split( '\n\n' )[ 0 ] }</p>
                                             </div>
                                             <Link
                                                 href={ `/work/${item.id}` }
@@ -298,11 +256,11 @@ export default function Gallery() {
             <footer className="py-10 bg-gray-900">
                 <div className="container mx-auto px-6 text-center">
                     <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 text-transparent bg-clip-text mb-3">
-                        LumeX
+                        { db.siteInfo.name }
                     </div>
-                    <p className="text-gray-400 mb-6">Capturing moments, telling stories</p>
+                    <p className="text-gray-400 mb-6">{ db.siteInfo.tagline }</p>
                     <div className="border-t border-gray-800 pt-6 text-gray-500 text-sm">
-                        © { new Date().getFullYear() } LumeX Photography. All rights reserved.
+                        { db.siteInfo.copyright }
                     </div>
                 </div>
             </footer>

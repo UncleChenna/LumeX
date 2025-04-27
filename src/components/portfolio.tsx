@@ -3,23 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X, Instagram, Twitter, Linkedin, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import db from '@/db';
 
-// Define our interfaces
-interface FeaturedWork {
-    id: number;
-    title: string;
-    category: string;
-    image: string;
-    alt: string;
-    description: string;
-}
-
-interface Service {
-    title: string;
-    description: string;
-    icon: string;
-}
-
+// Define interface for cursor position
 interface CursorPosition {
     x: number;
     y: number;
@@ -35,59 +21,7 @@ const Portfolio: React.FC = () => {
     // State for carousel
     const [ currentSlide, setCurrentSlide ] = useState<number>( 0 );
     const carouselRef = useRef<HTMLDivElement>( null );
-    const maxSlides = 3; // Number of slides in the carousel
-
-    // Featured work - in a real implementation, this would come from a CMS or database
-    const featuredWork: FeaturedWork[] = [
-        {
-            id: 1,
-            title: 'Urban Reflections',
-            category: 'Street Photography',
-            image: '/placeholder-image.jpg',
-            alt: 'Urban scene with reflections in puddles',
-            description: 'A series exploring the interplay of light, water, and urban architecture after rainfall in New York City.'
-        },
-        {
-            id: 2,
-            title: 'Neon Nights',
-            category: 'Cityscape',
-            image: '/placeholder-image.jpg',
-            alt: 'City at night with neon lights',
-            description: 'A visual journey through Tokyo\'s electric nightscape, where neon lights transform the city into a cyberpunk wonderland.'
-        },
-        {
-            id: 3,
-            title: 'Portrait Series',
-            category: 'Portrait',
-            image: '/placeholder-image.jpg',
-            alt: 'Dramatic portrait of a person',
-            description: 'An ongoing portrait project examining the diverse faces of New York City, capturing authentic moments that reveal essential human stories.'
-        },
-        {
-            id: 4,
-            title: 'Time-lapse: NYC',
-            category: 'Video',
-            image: '/placeholder-image.jpg',
-            alt: 'New York City time-lapse preview',
-            description: 'A time-lapse exploration of New York City\'s dynamic rhythm, showing the pulse of the city from dawn to dusk.'
-        },
-        {
-            id: 5,
-            title: 'Abandoned Spaces',
-            category: 'Urban Exploration',
-            image: '/placeholder-image.jpg',
-            alt: 'Abandoned building interior',
-            description: 'Documenting forgotten places where nature reclaims what humans have left behind, revealing beauty in decay.'
-        },
-        {
-            id: 6,
-            title: 'Motion Study',
-            category: 'Abstract',
-            image: '/placeholder-image.jpg',
-            alt: 'Abstract motion blur photography',
-            description: 'An experimental series using long exposure techniques to transform ordinary movements into abstract visual art.'
-        },
-    ];
+    const maxSlides = db.carouselSlides.length;
 
     // State for flippable cards
     const [ flippedCards, setFlippedCards ] = useState<{ [ key: number ]: boolean }>( {} );
@@ -195,49 +129,6 @@ const Portfolio: React.FC = () => {
         };
     }, [] );
 
-    // Services offered
-    const services: Service[] = [
-        {
-            title: 'Editorial Photography',
-            description: 'Compelling visual narratives for publications and media outlets.',
-            icon: '📰'
-        },
-        {
-            title: 'Commercial Work',
-            description: 'High-impact visuals for brands and advertising campaigns.',
-            icon: '🏢'
-        },
-        {
-            title: 'Event Coverage',
-            description: 'Comprehensive documentation of special events and moments.',
-            icon: '🎭'
-        },
-        {
-            title: 'Video Production',
-            description: 'Cinematic storytelling from concept to final cut.',
-            icon: '🎥'
-        }
-    ];
-
-    // Carousel slides
-    const carouselSlides = [
-        {
-            image: '/banner.jpg',
-            title: 'Street Photography',
-            subtitle: 'Capturing authentic moments in urban environments',
-        },
-        {
-            image: '/banner2.jpg',
-            title: 'Portrait Sessions',
-            subtitle: 'Revealing the essence of unique individuals',
-        },
-        {
-            image: '/banner.jpg',
-            title: 'Cinematic Stories',
-            subtitle: 'Visual narratives that evoke emotion',
-        },
-    ];
-
     return (
         <div className="bg-black text-white min-h-screen font-sans relative">
             {/* Custom cursor */ }
@@ -256,16 +147,14 @@ const Portfolio: React.FC = () => {
             <header className={ `fixed w-full z-40 transition-all duration-500 ${scrolled ? 'bg-black/80 backdrop-blur-md py-3' : 'bg-transparent py-6'}` }>
                 <div className="container mx-auto px-6 flex justify-between items-center">
                     <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 text-transparent bg-clip-text">
-                        LumeX
+                        { db.siteInfo.name }
                     </div>
 
                     {/* Desktop Navigation */ }
                     <nav className="hidden md:flex space-x-8">
-                        <a href="#home" className="hover:text-cyan-400 transition-colors">Home</a>
-                        <a href="#about" className="hover:text-cyan-400 transition-colors">About</a>
-                        <a href="#work" className="hover:text-cyan-400 transition-colors">Portfolio</a>
-                        <a href="#services" className="hover:text-cyan-400 transition-colors">Services</a>
-                        <a href="#contact" className="hover:text-cyan-400 transition-colors">Contact</a>
+                        { db.navigation.map( item => (
+                            <a key={ item.id } href={ item.path } className="hover:text-cyan-400 transition-colors">{ item.label }</a>
+                        ) ) }
                     </nav>
 
                     {/* Mobile menu button */ }
@@ -280,20 +169,24 @@ const Portfolio: React.FC = () => {
                 {/* Mobile menu */ }
                 <div className={ `md:hidden absolute w-full bg-black/95 backdrop-blur-lg transition-all duration-500 ease-in-out ${isMenuOpen ? 'max-h-96 py-4' : 'max-h-0 overflow-hidden'}` }>
                     <div className="container mx-auto px-6 flex flex-col space-y-4">
-                        <a href="#home" className="py-2 hover:text-cyan-400 transition-colors" onClick={ () => setIsMenuOpen( false ) }>Home</a>
-                        <a href="#about" className="py-2 hover:text-cyan-400 transition-colors" onClick={ () => setIsMenuOpen( false ) }>About</a>
-                        <a href="#work" className="py-2 hover:text-cyan-400 transition-colors" onClick={ () => setIsMenuOpen( false ) }>Portfolio</a>
-                        <a href="#services" className="py-2 hover:text-cyan-400 transition-colors" onClick={ () => setIsMenuOpen( false ) }>Services</a>
-                        <a href="#contact" className="py-2 hover:text-cyan-400 transition-colors" onClick={ () => setIsMenuOpen( false ) }>Contact</a>
+                        { db.navigation.map( item => (
+                            <a
+                                key={ item.id }
+                                href={ item.path }
+                                className="py-2 hover:text-cyan-400 transition-colors"
+                                onClick={ () => setIsMenuOpen( false ) }
+                            >
+                                { item.label }
+                            </a>
+                        ) ) }
                     </div>
                 </div>
             </header>
-
             {/* Hero section with carousel */ }
             <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
                 {/* Carousel */ }
                 <div className="absolute inset-0 z-0" ref={ carouselRef }>
-                    { carouselSlides.map( ( slide, index ) => (
+                    { db.carouselSlides.map( ( slide, index ) => (
                         <div
                             key={ index }
                             className={ `absolute inset-0 transition-opacity duration-1000 ${currentSlide === index ? 'opacity-100' : 'opacity-0'
@@ -347,7 +240,7 @@ const Portfolio: React.FC = () => {
                             Capturing <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">Moments</span> in Time
                         </h1>
                         <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-gray-300 animate-slideUp" style={ { animationDelay: '0.5s' } }>
-                            { carouselSlides[ currentSlide ].subtitle }
+                            { db.carouselSlides[ currentSlide ].subtitle }
                         </p>
                         <div className="flex flex-col md:flex-row gap-4 justify-center animate-fadeIn" style={ { animationDelay: '0.8s' } }>
                             <a
@@ -379,29 +272,29 @@ const Portfolio: React.FC = () => {
                         <div className="md:w-1/2">
                             <div className="relative opacity-0 animate-slideInLeft" style={ { animationDelay: '0.3s', animationFillMode: 'forwards' } }>
                                 <div className="w-full h-96 rounded-lg overflow-hidden">
-                                    <img src="/placeholder-image.jpg" alt="LumeX" className="w-full h-full object-cover" />
+                                    <img src="/placeholder-image.jpg" alt={ db.siteInfo.name } className="w-full h-full object-cover" />
                                 </div>
                                 <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg -z-10"></div>
                             </div>
                         </div>
                         <div className="md:w-1/2 opacity-0 animate-slideInRight" style={ { animationDelay: '0.5s', animationFillMode: 'forwards' } }>
                             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                                About <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">LumeX</span>
+                                About <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">{ db.siteInfo.name }</span>
                             </h2>
                             <p className="text-gray-300 mb-6">
-                                British photographer LumeX has documented the rapidly changing streets of New York City for over two decades. With an eye for the unusual and an exceptional ability to capture the energy of urban environments, LumeX's distinctive style has earned him recognition worldwide.
+                                { db.siteInfo.about.shortDescription }
                             </p>
                             <p className="text-gray-300 mb-8">
-                                His work has been featured in leading publications including The New York Times, The Guardian, and Vogue. When not on assignment, LumeX leads street photography workshops, sharing his passion and technical knowledge with aspiring photographers.
+                                { db.siteInfo.about.longDescription }
                             </p>
                             <div className="flex space-x-4">
-                                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                <a href={ db.siteInfo.social.instagram } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                     <Instagram size={ 24 } />
                                 </a>
-                                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                <a href={ db.siteInfo.social.twitter } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                     <Twitter size={ 24 } />
                                 </a>
-                                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                                <a href={ db.siteInfo.social.linkedin } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                     <Linkedin size={ 24 } />
                                 </a>
                             </div>
@@ -424,9 +317,9 @@ const Portfolio: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        { featuredWork.map( ( work, index ) => (
+                        { db.galleryItems.slice( 0, 6 ).map( ( item, index ) => (
                             <div
-                                key={ work.id }
+                                key={ item.id }
                                 className={ `opacity-0 animate-fadeIn cursor-pointer group` }
                                 style={ {
                                     animationDelay: `${0.3 + ( index * 0.15 )}s`,
@@ -434,12 +327,12 @@ const Portfolio: React.FC = () => {
                                     perspective: '1000px',
                                     height: '320px'
                                 } }
-                                onMouseEnter={ () => handleCardHover( work.id, true ) }
-                                onMouseLeave={ () => handleCardHover( work.id, false ) }
+                                onMouseEnter={ () => handleCardHover( item.id, true ) }
+                                onMouseLeave={ () => handleCardHover( item.id, false ) }
                             >
                                 <div
-                                    className={ `relative h-full w-full transition-transform duration-700 transform-gpu ${hoveredCardId === work.id || flippedCards[ work.id ] ? 'rotate-y-180' : ''
-                                        } ${( work.id === 2 || work.id === 4 ) && !hoveredCardId ? 'animate-pulseGlow' : ''
+                                    className={ `relative h-full w-full transition-transform duration-700 transform-gpu ${hoveredCardId === item.id || flippedCards[ item.id ] ? 'rotate-y-180' : ''
+                                        } ${( item.id === 2 || item.id === 4 ) && !hoveredCardId ? 'animate-pulseGlow' : ''
                                         }` }
                                     style={ { transformStyle: 'preserve-3d' } }
                                 >
@@ -452,8 +345,8 @@ const Portfolio: React.FC = () => {
                                             <p className="text-white text-sm font-medium">Hover to see details</p>
                                         </div>
                                         <img
-                                            src={ work.image }
-                                            alt={ work.alt }
+                                            src={ item.image }
+                                            alt={ item.alt }
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
                                     </div>
@@ -464,13 +357,13 @@ const Portfolio: React.FC = () => {
                                         style={ { backfaceVisibility: 'hidden' } }
                                     >
                                         <div>
-                                            <span className="text-cyan-400 text-sm font-medium">{ work.category }</span>
-                                            <h3 className="text-2xl font-bold text-white mt-2">{ work.title }</h3>
+                                            <span className="text-cyan-400 text-sm font-medium">{ db.getCategoryNameById( item.category ) }</span>
+                                            <h3 className="text-2xl font-bold text-white mt-2">{ item.title }</h3>
                                             <div className="w-12 h-1 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-full my-4"></div>
-                                            <p className="text-gray-300 text-sm">{ work.description }</p>
+                                            <p className="text-gray-300 text-sm">{ item.description.split( '\n\n' )[ 0 ] }</p>
                                         </div>
                                         <Link
-                                            href={ `/work/${work.id}` }
+                                            href={ `/work/${item.id}` }
                                             className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors mt-4 self-end"
                                         >
                                             View Project →
@@ -494,7 +387,6 @@ const Portfolio: React.FC = () => {
                     </div>
                 </div>
             </section>
-
             {/* Services section with animations */ }
             <section id="services" className="py-20 md:py-32 bg-gradient-to-b from-gray-900 to-black overflow-hidden">
                 <div className="container mx-auto px-6">
@@ -508,7 +400,7 @@ const Portfolio: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        { services.map( ( service, index ) => (
+                        { db.services.map( ( service, index ) => (
                             <div
                                 key={ index }
                                 className="bg-gray-900/50 backdrop-blur-sm p-8 rounded-lg border border-gray-800 hover:border-cyan-500/50 transition-all duration-300 opacity-0 animate-slideUp"
@@ -596,31 +488,35 @@ const Portfolio: React.FC = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <div className="mb-6 md:mb-0">
                             <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 text-transparent bg-clip-text mb-2">
-                                LumeX
+                                { db.siteInfo.name }
                             </div>
-                            <p className="text-gray-400">Capturing moments, telling stories</p>
+                            <p className="text-gray-400">{ db.siteInfo.tagline }</p>
                         </div>
                         <div className="flex space-x-8">
-                            <a href="#home" className="text-gray-400 hover:text-white transition-colors">Home</a>
-                            <a href="#about" className="text-gray-400 hover:text-white transition-colors">About</a>
-                            <a href="#work" className="text-gray-400 hover:text-white transition-colors">Portfolio</a>
-                            <a href="#services" className="text-gray-400 hover:text-white transition-colors">Services</a>
-                            <a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a>
+                            { db.navigation.map( item => (
+                                <a
+                                    key={ item.id }
+                                    href={ item.path }
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                >
+                                    { item.label }
+                                </a>
+                            ) ) }
                         </div>
                         <div className="flex space-x-4 mt-6 md:mt-0">
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.instagram } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Instagram size={ 20 } />
                             </a>
-                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.twitter } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Twitter size={ 20 } />
                             </a>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                            <a href={ db.siteInfo.social.linkedin } target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
                                 <Linkedin size={ 20 } />
                             </a>
                         </div>
                     </div>
                     <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
-                        © { new Date().getFullYear() } LumeX Photography. All rights reserved.
+                        { db.siteInfo.copyright }
                     </div>
                 </div>
             </footer>
