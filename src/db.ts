@@ -92,17 +92,17 @@ const db = {
   // Carousel slides for homepage
   carouselSlides: [
     {
-      image: "/banner.jpg",
+      image: "/banner/banner.jpg",
       title: "Street Photography",
       subtitle: "Capturing authentic moments in urban environments"
     },
     {
-      image: "/banner2.jpg",
+      image: "/banner/banner2.jpg",
       title: "Portrait Sessions",
       subtitle: "Revealing the essence of unique individuals"
     },
     {
-      image: "/banner.jpg",
+      image: "/banner/banner.jpg",
       title: "Cinematic Stories",
       subtitle: "Visual narratives that evoke emotion"
     }
