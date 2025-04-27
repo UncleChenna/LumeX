@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
 import WorkDetail from '@/components/work_detail';
 
-
 type Params = Promise<{ id: string }>;
-
 
 interface WorkPageProps {
     params: Params;
@@ -15,8 +13,8 @@ export async function generateMetadata( {
 }: WorkPageProps ): Promise<Metadata> {
     const { id } = await params;
     return {
-        title: `LumeX Portfolio - Work #${id}`,
-        description: 'Detailed view of LumeX\'s photography work',
+        title: `Lumex Portfolio - Work #${id}`,
+        description: "Explore the storytelling photography and videography of Favour Iheme, founder of Lumex.",
     };
 }
 

@@ -36,8 +36,8 @@ const db = {
     owner: "LumeX Photography",
     copyright: `© ${new Date().getFullYear()} LumeX Photography. All rights reserved.`,
     about: {
-      shortDescription: "British photographer LumeX has documented the rapidly changing streets of New York City for over two decades. With an eye for the unusual and an exceptional ability to capture the energy of urban environments, LumeX's distinctive style has earned him recognition worldwide.",
-      longDescription: "His work has been featured in leading publications including The New York Times, The Guardian, and Vogue. When not on assignment, LumeX leads street photography workshops, sharing his passion and technical knowledge with aspiring photographers."
+      shortDescription: "Nigerian-born photographer and videographer Favour Iheme has been capturing the vibrant moments of life since moving to Canada to pursue his passion. With a fresh perspective and a creative eye, Favour’s work embodies the spirit of storytelling through powerful visuals, representing the Lumex brand.",
+      longDescription: "After relocating to Canada to study photography and videography, Favour Iheme quickly made a name for himself with his dynamic and emotive style. His work reflects a fusion of his Nigerian roots and global influences, creating striking images that connect deeply with viewers. As the creative force behind Lumex, Favour continues to push boundaries, inspiring a new generation of visual storytellers through his art and workshops."
     },
     social: {
       instagram: "https://instagram.com",
