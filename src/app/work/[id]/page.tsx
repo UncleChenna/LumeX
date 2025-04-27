@@ -14,7 +14,8 @@ export async function generateMetadata( {
     const { id } = await params;
     return {
         title: `Lumex Portfolio - Work #${id}`,
-        description: "Explore the storytelling photography and videography of Favour Iheme, founder of Lumex.",
+        description: "Lumex showcases the photography and cinematic videography of Favour Iheme, a talented Nigerian-born artist now based in Canada. Specializing in storytelling, portraiture, and urban landscapes, Favour captures powerful moments with creativity and passion."
+
     };
 }
 
