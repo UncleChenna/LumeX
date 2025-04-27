@@ -202,7 +202,7 @@ const Portfolio: React.FC = () => {
                     ) ) }
 
                     {/* Carousel Navigation */ }
-                    <button
+                    {/* <button
                         onClick={ prevSlide }
                         className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300"
                         aria-label="Previous slide"
@@ -215,7 +215,7 @@ const Portfolio: React.FC = () => {
                         aria-label="Next slide"
                     >
                         <ChevronRight size={ 24 } />
-                    </button>
+                    </button> */}
 
                     {/* Carousel Indicators */ }
                     <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
