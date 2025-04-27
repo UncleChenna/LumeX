@@ -222,17 +222,17 @@ const Portfolio: React.FC = () => {
     // Carousel slides
     const carouselSlides = [
         {
-            image: '/placeholder-image.jpg',
+            image: '/banner.jpg',
             title: 'Street Photography',
             subtitle: 'Capturing authentic moments in urban environments',
         },
         {
-            image: '/placeholder-image.jpg',
+            image: '/banner2.jpg',
             title: 'Portrait Sessions',
             subtitle: 'Revealing the essence of unique individuals',
         },
         {
-            image: '/placeholder-image.jpg',
+            image: '/banner.jpg',
             title: 'Cinematic Stories',
             subtitle: 'Visual narratives that evoke emotion',
         },
@@ -303,7 +303,7 @@ const Portfolio: React.FC = () => {
                             <img
                                 src={ slide.image }
                                 alt={ slide.title }
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover object-[center_5%]"
                             />
                         </div>
                     ) ) }
